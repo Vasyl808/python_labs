@@ -1,0 +1,1 @@
+DROP TABLE `pp`.`user`, `pp`.`order`, `pp`.`order_details`, `pp`.`medicine`, `pp`.`category`;
