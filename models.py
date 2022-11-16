@@ -15,7 +15,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship
 
 #engine = create_engine("mysql://root:vasja2004@localhost:3306/pp")
-engine = create_engine("mysql+mysqlconnector://root:Ne4Te2Si1Fi3_3@localhost:3306/dragstore")
+engine = create_engine("mysql+mysqlconnector://user_name:password@host/database_name")
 
 SessionFactory = sessionmaker(bind=engine)
 
