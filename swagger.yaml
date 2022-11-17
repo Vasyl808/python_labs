@@ -57,7 +57,7 @@ paths:
         - pharmacy_auth:
             - write:medicine
             - read:medicine
-  /medicine/findByStatus:
+  /medicine/findByStatus/{status}:
     get:
       tags:
         - medicine
@@ -66,10 +66,9 @@ paths:
       operationId: findMedicineByStatus
       parameters:
         - name: status
-          in: query
+          in: path
           description: Status values that need to be considered for filter
-          required: false
-          explode: true
+          required: true
           schema:
             type: string
             default: available
@@ -97,7 +96,7 @@ paths:
         - pharmacy_auth:
             - write:medicine
             - read:medicine
-  /medicine/findDemand:
+  /medicine/findDemand/{demand}:
     get:
       tags:
         - medicine
@@ -105,7 +104,7 @@ paths:
       operationId: findMedicineByDemand
       parameters:
         - name: demand
-          in: query
+          in: path
           description: Status values that need to be considered for filter
           required: true
           schema:
@@ -361,6 +360,46 @@ paths:
           description: Invalid ID supplied
         '404':
           description: Order not found
+    put:
+      tags:
+        - pharmacy
+      summary: Update order details
+      description: This can only be done by the logged in user or admin.
+      operationId: updateOrderdetails
+      parameters:
+        - name: orderId
+          in: path
+          description: orderId that need to be update
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: medicineId
+          in: path
+          description: medicineId that need to be update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Update an order details in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order_details'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Order_details'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Order_details'
+      responses:
+        200:
+          description: Successful operation
+        405:
+          description: Invalid input
+        404:
+          description: Order not found
   /pharmacy/order/{orderId}:
     get:
       tags:
@@ -471,6 +510,10 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          description: Validation Error
+        '409':
+          description: User with such username or email or id already exists.
   /user/login:
     get:
       tags:
@@ -514,6 +557,8 @@ paths:
                 type: string
         '400':
           description: Invalid username/password supplied
+        '404':
+          description: User with such username does not exist
   /user/logout:
     get:
       tags:
@@ -583,6 +628,10 @@ paths:
       responses:
         default:
           description: successful operation
+        '400':
+          description: Invalid user ID supplied
+        '404':
+          description: User not found
     delete:
       tags:
         - user
