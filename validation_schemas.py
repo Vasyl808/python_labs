@@ -92,4 +92,3 @@ class CategorySchemaUpdate(Schema):
     id_category = fields.Integer(strict=True)
     category_name = fields.String(validate=Length(min=4,max=255))
     description = fields.String(validate=Length(min=4,max=300))
-

@@ -8,7 +8,7 @@
 pip install -r requirements.txt      
 ```
 
-### Boot it via gunicorn with the command below
+### Boot it via waitress-serve with the command below
 ```commandline
 waitress-serve --port=8080 --url-scheme=http main:app
 ```
