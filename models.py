@@ -14,8 +14,8 @@ from sqlalchemy import create_engine, select, update, delete, values
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship
 
-#engine = create_engine("mysql://root:pass@localhost:3306/pp")
-engine = create_engine("mysql+mysqlconnector://root:pass@localhost:3306/pp")
+#engine = create_engine("mysql://root:vasja2004@localhost:3306/pp")
+engine = create_engine("mysql+mysqlconnector://root:vasja2004@localhost:3306/pp")
 
 SessionFactory = sessionmaker(bind=engine)
 
@@ -48,11 +48,9 @@ class User(BaseModel):
         session = Session()
         return session.query(cls).filter_by(username=username).first()
 
-    @classmethod
-    def is_pharmacist(cls, userstatus):
+    @staticmethod
+    def is_pharmacist(userstatus):
         return userstatus == "pharmacist"
-
-
 
 
 Order_details = Table('order_details', BaseModel.metadata,
@@ -73,6 +71,7 @@ class Medicine(BaseModel):
     price = Column(Integer, nullable=False)
     medicine_status = Column(Enum("available", "pending", "sold"), nullable=False)
     demand = Column(Boolean, nullable=False)
+    quantity = Column(Integer, nullable=False)
 
     order = relationship("Order", secondary=Order_details, back_populates="medicine")
 

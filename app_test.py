@@ -133,7 +133,8 @@ class BaseTestCase(TestCase):
             "category_id": 2,
             "price": 2,
             "medicine_status": "available",
-            "demand": False
+            "demand": False,
+            "quantity": 20
         }
 
         self.medicine_2_data = {
@@ -144,7 +145,8 @@ class BaseTestCase(TestCase):
             "category_id": 2,
             "price": 20,
             "medicine_status": "available",
-            "demand": 0
+            "demand": 0,
+            "quantity": 20
         }
 
         self.medicine_3_data = {
@@ -155,7 +157,8 @@ class BaseTestCase(TestCase):
             "category_id": 2,
             "price": 20,
             "medicine_status": "available",
-            "demand": 0
+            "demand": 0,
+            "quantity": 20
         }
 
         self.medicine_4_data = {
@@ -166,7 +169,20 @@ class BaseTestCase(TestCase):
             "category_id": 10,
             "price": 20,
             "medicine_status": "available",
-            "demand": False
+            "demand": False,
+            "quantity": 20
+        }
+
+        self.medicine_5_data = {
+            "id_medicine": 5,
+            "medicine_name": "test2",
+            "manufacturer": "HeartBeat",
+            "medicine_description": "test1",
+            "category_id": 1,
+            "price": 20,
+            "medicine_status": "sold",
+            "demand": 0,
+            "quantity": 0
         }
 
         # Orders data
@@ -220,7 +236,7 @@ class BaseTestCase(TestCase):
         self.order_medicine_2_data = {
             "order_id": 2,
             "medicine_id": 2,
-            "count": 1
+            "count": 20
         }
 
         self.order_medicine_3_data = {
@@ -280,6 +296,8 @@ class BaseTestCase(TestCase):
                          headers=self.get_auth_headers(self.admin_1_credentials))
         self.client.post('api/v1/medicine', json=self.medicine_2_data,
                          headers=self.get_auth_headers(self.admin_1_credentials))
+        self.client.post('api/v1/medicine', json=self.medicine_5_data,
+                         headers=self.get_auth_headers(self.admin_1_credentials))
 
     def create_all_orders(self):
         self.client.post('api/v1/pharmacy/order', json=self.order_1_data,
@@ -298,46 +316,62 @@ class BaseTestCase(TestCase):
 class TestUser(BaseTestCase):
     def test_create_user_1(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         response = self.client.post('api/v1/user', json=self.user_1_data)
         self.assertEqual(response.status_code, 200)
 
     def test_create_not_unique_user(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         response = self.client.post('api/v1/user', json=self.user_3_data)
         self.assertEqual(response.status_code, 400)
 
     def test_create_not_unique_user1(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         self.client.post('api/v1/user', json=self.user_1_data)
         response = self.client.post('api/v1/user', json=self.user_1_data)
         self.assertEqual(response.status_code, 409)
 
     def test_get_user_by_id(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         self.create_all_users()
         response = self.client.get('api/v1/user/1', headers=self.get_auth_headers(self.admin_1_credentials))
         self.assertEqual(response.status_code, 200)
 
     def test_get_user_by_id1(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         self.create_all_users()
         response = self.client.get('api/v1/user/1000', headers=self.get_auth_headers(self.admin_1_credentials))
         self.assertEqual(response.status_code, 404)
 
     def test_get_user_by_id2(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         self.create_all_users()
         response = self.client.get('api/v1/user/2', headers=self.get_auth_headers(self.user_1_credentials))
         self.assertEqual(response.status_code, 403)
 
     def test_get_user_by_not_existing_id(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         self.create_all_users()
         response = self.client.get('api/v1/user/0', headers=self.get_auth_headers(self.admin_1_credentials))
         self.assertEqual(response.status_code, 400)
 
     def test_update_user(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         self.create_all_users()
 
         response = self.client.put('api/v1/user/2', data=json.dumps({
@@ -349,11 +383,13 @@ class TestUser(BaseTestCase):
             "password": "user2",
             "phone_number": "0999309899",
             "userstatus": "user"
-        }), content_type='application/json', headers=self.get_auth_headers(self.admin_1_credentials))
+        }), content_type='application/json', headers=self.get_auth_headers(self.user_2_credentials))
         self.assertEqual(response.status_code, 200)
 
     def test_update_user5(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         self.create_all_users()
 
         response = self.client.put('api/v1/user/2', data=json.dumps({
@@ -370,46 +406,58 @@ class TestUser(BaseTestCase):
 
     def test_update_user1(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         self.create_all_users()
 
         response = self.client.put('api/v1/user/2', data=json.dumps({
             "username": "us"
-        }), content_type='application/json', headers=self.get_auth_headers(self.admin_1_credentials))
+        }), content_type='application/json', headers=self.get_auth_headers(self.user_2_credentials))
         self.assertEqual(response.status_code, 400)
 
     def test_update_user2(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         self.create_all_users()
 
         response = self.client.put('api/v1/user/200', data=json.dumps({
             "username": "user22"
-        }), content_type='application/json', headers=self.get_auth_headers(self.admin_1_credentials))
+        }), content_type='application/json', headers=self.get_auth_headers(self.user_2_credentials))
         self.assertEqual(response.status_code, 404)
 
     def test_update_user3(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         self.create_all_users()
         response = self.client.put('api/v1/user/1', data=json.dumps({
             "username": "user2"
-        }), content_type='application/json', headers=self.get_auth_headers(self.admin_1_credentials))
+        }), content_type='application/json', headers=self.get_auth_headers(self.user_1_credentials))
         self.assertEqual(response.status_code, 400)
 
     def test_update_user4(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         self.create_all_users()
         response = self.client.put('api/v1/user/1', data=json.dumps({
             "email": "user2@gmail.com"
-        }), content_type='application/json', headers=self.get_auth_headers(self.admin_1_credentials))
+        }), content_type='application/json', headers=self.get_auth_headers(self.user_1_credentials))
         self.assertEqual(response.status_code, 400)
 
     def test_delete_user(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         self.create_all_users()
         response = self.client.delete('api/v1/user/1', headers=self.get_auth_headers(self.admin_1_credentials))
         self.assertEqual(response.status_code, 200)
 
     def test_delete_not_existing_user(self):
         self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
         self.create_all_users()
         response = self.client.delete('api/v1/user/10000', headers=self.get_auth_headers(self.admin_1_credentials))
         self.assertEqual(response.status_code, 404)
@@ -417,31 +465,36 @@ class TestUser(BaseTestCase):
 
 class TestCategory(BaseTestCase):
     def test_create_category(self):
+        self.clear_medicine_db()
         self.clear_category_db()
         response = self.client.post('api/v1/category', json=self.category_1_data,
                                     headers=self.get_auth_headers(self.admin_1_credentials))
         self.assertEqual(response.status_code, 200)
 
     def test_create_category1(self):
+        self.clear_medicine_db()
         self.clear_category_db()
         self.create_all_categories()
         response = self.client.post('api/v1/category', json=self.category_1_data,
                                     headers=self.get_auth_headers(self.admin_1_credentials))
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 400)
 
     def test_create_category2(self):
+        self.clear_medicine_db()
         self.clear_category_db()
         response = self.client.post('api/v1/category', json=self.category_3_data,
                                     headers=self.get_auth_headers(self.admin_1_credentials))
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 400)
 
     def test_create_category_access_denied(self):
+        self.clear_medicine_db()
         self.clear_category_db()
         response = self.client.post('api/v1/category', json=self.category_1_data,
                                     headers=self.get_auth_headers(self.user_1_credentials))
         self.assertEqual(response.status_code, 403)
 
     def test_get_category(self):
+        self.clear_medicine_db()
         self.clear_category_db()
         self.create_all_categories()
 
@@ -450,6 +503,7 @@ class TestCategory(BaseTestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_get_category1(self):
+        self.clear_medicine_db()
         self.clear_category_db()
         self.create_all_categories()
 
@@ -458,6 +512,7 @@ class TestCategory(BaseTestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_delete_category(self):
+        self.clear_medicine_db()
         self.clear_category_db()
         self.create_all_categories()
 
@@ -466,6 +521,7 @@ class TestCategory(BaseTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_delete_category1(self):
+        self.clear_medicine_db()
         self.clear_category_db()
         self.create_all_categories()
 
@@ -474,6 +530,7 @@ class TestCategory(BaseTestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_delete_category_access_denied(self):
+        self.clear_medicine_db()
         self.clear_category_db()
         self.create_all_categories()
 
@@ -482,6 +539,7 @@ class TestCategory(BaseTestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_update_category(self):
+        self.clear_medicine_db()
         self.clear_category_db()
         self.create_all_categories()
         response = self.client.put('api/v1/category/2', data=json.dumps({
@@ -491,6 +549,7 @@ class TestCategory(BaseTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_update_category1(self):
+        self.clear_medicine_db()
         self.clear_category_db()
         self.create_all_categories()
         response = self.client.put('api/v1/category/2', data=json.dumps({
@@ -500,6 +559,7 @@ class TestCategory(BaseTestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_update_category2(self):
+        self.clear_medicine_db()
         self.clear_category_db()
         self.create_all_categories()
         response = self.client.put('api/v1/category/100', data=json.dumps({
@@ -509,6 +569,7 @@ class TestCategory(BaseTestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_update_category3(self):
+        self.clear_medicine_db()
         self.clear_category_db()
         self.create_all_categories()
         response = self.client.put('api/v1/category/1', data=json.dumps({
@@ -518,13 +579,14 @@ class TestCategory(BaseTestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_update_category4(self):
+        self.clear_medicine_db()
         self.clear_category_db()
         self.create_all_categories()
         response = self.client.put('api/v1/category/1', data=json.dumps({
             "category_name": "Pills",
             "description": "Ivan",
         }), content_type='application/json', headers=self.get_auth_headers(self.admin_1_credentials))
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 400)
 
 
 class TestMedicine(BaseTestCase):
@@ -542,7 +604,7 @@ class TestMedicine(BaseTestCase):
         self.create_all_categories()
         response = self.client.post('api/v1/medicine', json=self.medicine_3_data,
                                     headers=self.get_auth_headers(self.admin_1_credentials))
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 400)
 
     def test_create_not_unique_medicine1(self):
         self.clear_medicine_db()
@@ -550,7 +612,7 @@ class TestMedicine(BaseTestCase):
         self.create_all_categories()
         response = self.client.post('api/v1/medicine', json=self.medicine_4_data,
                                     headers=self.get_auth_headers(self.admin_1_credentials))
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 400)
 
     def test_create_medicine_access_denied(self):
         self.clear_medicine_db()
@@ -707,7 +769,7 @@ class TestMedicine(BaseTestCase):
         self.clear_category_db()
         self.create_all_categories()
         self.create_all_medicines()
-        response = self.client.put('api/v1/medicine/demand/1')
+        response = self.client.put('api/v1/medicine/demand/5', headers=self.get_auth_headers(self.user_1_credentials))
         self.assertEqual(response.status_code, 200)
 
     def test_add_not_existing_medicine_to_demand(self):
@@ -715,8 +777,24 @@ class TestMedicine(BaseTestCase):
         self.clear_category_db()
         self.create_all_categories()
         self.create_all_medicines()
-        response = self.client.put('api/v1/medicine/demand/1000',)
-        self.assertEqual(response.status_code, 405)
+        response = self.client.put('api/v1/medicine/demand/100', headers=self.get_auth_headers(self.user_1_credentials))
+        self.assertEqual(response.status_code, 400)
+
+    def test_add_not_existing_medicine_to_demand1(self):
+        self.clear_medicine_db()
+        self.clear_category_db()
+        self.create_all_categories()
+        self.create_all_medicines()
+        response = self.client.put('api/v1/medicine/demand/1', headers=self.get_auth_headers(self.user_1_credentials))
+        self.assertEqual(response.status_code, 400)
+
+    def test_add_not_existing_medicine_to_demand11(self):
+        self.clear_medicine_db()
+        self.clear_category_db()
+        self.create_all_categories()
+        self.create_all_medicines()
+        response = self.client.put('api/v1/medicine/demand/1', headers=self.get_auth_headers(self.admin_1_credentials))
+        self.assertEqual(response.status_code, 403)
 
 
 class TestOrder(BaseTestCase):
@@ -742,7 +820,7 @@ class TestOrder(BaseTestCase):
         self.create_all_users()
         response = self.client.post('api/v1/pharmacy/order', json=self.order_3_data,
                                     headers=self.get_auth_headers(self.user_2_credentials))
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 400)
 
     def test_create_order_access_denied(self):
         self.clear_order_db()
@@ -766,7 +844,7 @@ class TestOrder(BaseTestCase):
         self.create_all_users()
         response = self.client.post('api/v1/pharmacy/order', json=self.order_4_data,
                                     headers=self.get_auth_headers(self.user_1_credentials))
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 400)
 
     def test_add_medicine_to_order(self):
         self.clear_user_db()
@@ -794,7 +872,7 @@ class TestOrder(BaseTestCase):
         self.create_all_orders()
         response = self.client.post('api/v1/pharmacy/order/medicine', json=self.order_medicine_1_data,
                                     headers=self.get_auth_headers(self.user_1_credentials))
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 400)
 
     def test_add_medicine_to_order11(self):
         self.clear_order_db()
@@ -833,7 +911,7 @@ class TestOrder(BaseTestCase):
         self.create_all_orders()
         response = self.client.post('api/v1/pharmacy/order/medicine', json=self.order_medicine_3_data,
                                     headers=self.get_auth_headers(self.user_2_credentials))
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 400)
 
     def test_add_medicine_to_order_access_denied(self):
         self.clear_order_db()
@@ -863,7 +941,24 @@ class TestOrder(BaseTestCase):
             "count": 1
         },
             headers=self.get_auth_headers(self.user_2_credentials))
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 400)
+
+    def test_add_medicine_count(self):
+        self.clear_order_db()
+        self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
+        self.create_all_categories()
+        self.create_all_medicines()
+        self.create_all_users()
+        self.create_all_orders()
+        response = self.client.post('api/v1/pharmacy/order/medicine', json={
+            "order_id": 1,
+            "medicine_id": 1,
+            "count": 100000
+        },
+            headers=self.get_auth_headers(self.user_1_credentials))
+        self.assertEqual(response.status_code, 400)
 
     def test_add_medicine_to_not_existing_order1(self):
         self.clear_order_db()
@@ -880,9 +975,9 @@ class TestOrder(BaseTestCase):
             "count": 0
         },
                                     headers=self.get_auth_headers(self.user_2_credentials))
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 400)
 
-    def test_delete(self):
+    def test_delete1(self):
         self.clear_order_db()
         self.clear_user_db()
         self.clear_medicine_db()
@@ -892,8 +987,9 @@ class TestOrder(BaseTestCase):
         self.create_all_users()
         self.create_all_orders()
         self.create_all_order_medicine_tables()
-        response = self.client.delete('api/v1/pharmacy/order/1/1', headers=self.get_auth_headers(self.user_1_credentials))
-        self.assertEqual(response.status_code, 400)
+        response = self.client.delete('api/v1/pharmacy/order/2/2',
+                                      headers=self.get_auth_headers(self.user_2_credentials))
+        self.assertEqual(response.status_code, 200)
 
     def test_test_delete1(self):
         self.clear_order_db()
@@ -905,7 +1001,8 @@ class TestOrder(BaseTestCase):
         self.create_all_users()
         self.create_all_orders()
         self.create_all_order_medicine_tables()
-        response = self.client.delete('api/v1/pharmacy/order/1/1', headers=self.get_auth_headers(self.user_2_credentials))
+        response = self.client.delete('api/v1/pharmacy/order/1/1',
+                                      headers=self.get_auth_headers(self.user_2_credentials))
         self.assertEqual(response.status_code, 403)
 
     def test_test_delete2(self):
@@ -918,7 +1015,8 @@ class TestOrder(BaseTestCase):
         self.create_all_users()
         self.create_all_orders()
         self.create_all_order_medicine_tables()
-        response = self.client.delete('api/v1/pharmacy/order/10000/1', headers=self.get_auth_headers(self.user_2_credentials))
+        response = self.client.delete('api/v1/pharmacy/order/10000/1',
+                                      headers=self.get_auth_headers(self.user_2_credentials))
         self.assertEqual(response.status_code, 404)
 
     def test_update_details(self):
@@ -932,9 +1030,24 @@ class TestOrder(BaseTestCase):
         self.create_all_medicines()
         self.create_all_orders()
         self.create_all_order_medicine_tables()
-        response = self.client.put('/api/v1/pharmacy/order/2/2', json={"count": 10},
-                                   headers=self.get_auth_headers(self.user_2_credentials))
+        response = self.client.put('/api/v1/pharmacy/order/1/1', json={"count": 10},
+                                   headers=self.get_auth_headers(self.user_1_credentials))
         self.assertEqual(response.status_code, 200)
+
+    def test_update_details_count(self):
+        self.clear_user_db()
+        self.clear_order_db()
+        self.clear_order_medicine_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
+        self.create_all_users()
+        self.create_all_categories()
+        self.create_all_medicines()
+        self.create_all_orders()
+        self.create_all_order_medicine_tables()
+        response = self.client.put('/api/v1/pharmacy/order/2/2', json={"count": 300},
+                                   headers=self.get_auth_headers(self.user_2_credentials))
+        self.assertEqual(response.status_code, 400)
 
     def test_update_details1(self):
         self.clear_order_db()
@@ -1108,7 +1221,23 @@ class TestOrder(BaseTestCase):
             "complete": 0
         },
             headers=self.get_auth_headers(self.admin_1_credentials))
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_order_update808(self):
+        self.clear_order_db()
+        self.clear_user_db()
+        self.clear_medicine_db()
+        self.clear_category_db()
+        self.create_all_categories()
+        self.create_all_medicines()
+        self.create_all_users()
+        self.create_all_orders()
+        self.create_all_order_medicine_tables()
+        response = self.client.put('api/v1/pharmacy/order/1', json = {
+            "order_status": "approved"
+        },
+            headers=self.get_auth_headers(self.admin_1_credentials))
+        self.assertEqual(response.status_code, 200)
 
     def test_delete_order(self):
         self.clear_order_db()
