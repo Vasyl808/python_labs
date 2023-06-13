@@ -72,6 +72,8 @@ class Medicine(BaseModel):
     medicine_status = Column(Enum("available", "pending", "sold"), nullable=False)
     demand = Column(Boolean, nullable=False)
     quantity = Column(Integer, nullable=False)
+    image_url = Column(String(256), nullable=False)
+    demand_count = Column(Integer, nullable=True)
 
     order = relationship("Order", secondary=Order_details, back_populates="medicine")
 

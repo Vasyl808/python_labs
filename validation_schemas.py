@@ -7,7 +7,7 @@ class UserSchema(Schema):
     username = fields.String(required=True, validate=Length(min=3,max=255))
     first_name = fields.String(required=True, validate=Length(min=3,max=255))
     last_name = fields.String(required=True, validate=Length(min=3,max=255))
-    age = fields.Integer(required=True, strict=True)
+    age = fields.Integer(required=True)
     email = fields.String(required=True, validate=Length(min=8,max=255))
     password = fields.String(required=True, validate=Length(min=4,max=255))
     phone_number = fields.String(required=True, validate=Length(min=9,max=20))
@@ -25,11 +25,13 @@ class MedicineSchema(Schema):
     medicine_name = fields.String(required=True, validate=Length(min=3,max=65))
     manufacturer = fields.String(required=True, validate=Length(min=3,max=65))
     medicine_description = fields.String(required=True, validate=Length(min=4,max=255))
-    category_id = fields.Integer(required=True, strict=True)
-    price = fields.Integer(required=True, strict=True)
+    category_id = fields.Integer(required=True)
+    price = fields.Integer(required=True)
     medicine_status = fields.Str(required=True, validate=validate.OneOf(["available", "pending", "sold"]))
-    demand = fields.Boolean(required=True, strict=True)
-    quantity = fields.Integer(required=True, strict=True)
+    demand = fields.Boolean(required=True)
+    quantity = fields.Integer(required=True)
+    image_url = fields.String(required=True, validate=Length(min=20, max=256))
+    demand_count = fields.Integer()
 
 
 class OrderSchema(Schema):
@@ -49,11 +51,11 @@ class CategorySchema(Schema):
 
 
 class UserSchemaUpdate(Schema):
-    id_user = fields.Integer(strict=True)
+    id_user = fields.Integer()
     username = fields.String(validate=Length(min=3,max=255))
     first_name = fields.String(validate=Length(min=3,max=255))
     last_name = fields.String(validate=Length(min=3,max=255))
-    age = fields.Integer(strict=True)
+    age = fields.Integer()
     email = fields.String(validate=Length(min=12,max=255))
     password = fields.String(validate=Length(min=4,max=255))
     phone_number = fields.String(validate=Length(min=9,max=20))
@@ -76,6 +78,8 @@ class MedicineSchemaUpdate(Schema):
     medicine_status = fields.Str(validate=validate.OneOf(["available", "pending", "sold"]))
     demand = fields.Boolean(strict=True)
     quantity = fields.Integer(strict=True)
+    image_url = fields.String(validate=Length(min=20, max=256))
+    demand_count = fields.Integer()
 
 
 class OrderSchemaUpdate(Schema):
