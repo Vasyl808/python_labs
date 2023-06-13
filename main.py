@@ -18,11 +18,11 @@ app = Flask(__name__)
 # session = Session()
 bcrypt = Bcrypt()
 auth = HTTPBasicAuth()
-app.config['SECRET_KEY'] = 'secret!'
+app.config['SECRET_KEY'] = 'pass'
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = 'pharmacyreset@gmail.com'
-app.config['MAIL_PASSWORD'] = 'bsovaycfdxgrlqgl'
+app.config['MAIL_USERNAME'] = 'yourmail@gmail.com'
+app.config['MAIL_PASSWORD'] = 'pass'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 socketio = SocketIO(app, cors_allowed_origins=['http://127.0.0.1:5500', 'http://localhost:3000'])
