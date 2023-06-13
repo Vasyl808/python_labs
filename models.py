@@ -14,8 +14,8 @@ from sqlalchemy import create_engine, select, update, delete, values
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship
 
-#engine = create_engine("mysql://root:vasja2004@localhost:3306/pp")
-engine = create_engine("mysql+mysqlconnector://root:vasja2004@localhost:3306/pp")
+#engine = create_engine("mysql://root:pass@localhost:3306/pp")
+engine = create_engine("mysql+mysqlconnector://root:pass@localhost:3306/pp")
 
 SessionFactory = sessionmaker(bind=engine)
 
